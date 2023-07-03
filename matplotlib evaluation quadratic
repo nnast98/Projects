@@ -1,0 +1,22 @@
+import matplotlib.pyplot as plt
+
+# Quadratic equation coefficients
+a = int(input())
+b = int(input())
+c = int(input())
+
+# Generate x values
+x = range(-10, 11)
+
+# Evaluate the quadratic equation for each x
+y = [a * (i**2) + b * i + c for i in x]
+
+# Create the plot
+plt.plot(x, y)
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Quadratic Equation: y = {}x^2 + {}x + {}'.format(a, b, c))
+plt.grid(True)
+
+# Show the plot
+plt.show()
