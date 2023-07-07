@@ -1,0 +1,76 @@
+import requests
+from dotenv import load_dotenv
+import os
+import json
+
+
+class Dating():
+    def name(self):
+        name = input("Enter your name: ")
+        return name
+
+
+class Person(Dating):
+    def match_1(self):
+        name = self.name()
+        address = input("Enter your address: ")
+        coordinates = self.get_coordinates(address)
+        interests = input('Enter your interests: ')
+        return interests
+
+    def get_coordinates(self, address):
+        api_key = os.getenv("YOUR_API_KEY")  # Replace with your Google Maps API key
+        geocoding_api_url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}"
+
+        response = requests.get(geocoding_api_url)
+        data = response.json()
+
+        if data['status'] == 'OK':
+            latitude = data['results'][0]['geometry']['location']['lat']
+            longitude = data['results'][0]['geometry']['location']['lng']
+            return latitude, longitude
+        else:
+            print("Error: Unable to retrieve coordinates.")
+            return None
+
+
+class Person_2(Dating):
+    def __init__(self, name, age, interests):
+        super().__init__()
+        self.name = name
+        self.age = age
+        self.interests = interests
+
+    def match_2(self):
+        return self.interests
+
+    def find_match(self):
+        person1 = Person()
+
+        print("\nEnter the details of the other person:")
+        name = input("Enter their name: ")
+        address = input("Enter their address: ")
+        coordinates = person1.get_coordinates(address)
+
+        person2 = Person_2(name, None, coordinates)
+
+        interests1 = person1.match_1()
+        interests2 = person2.match_2()
+
+        if interests1 == interests2:
+            print("That's a match!")
+        else:
+            print("No match found.")
+
+        if interests1 == interests2 and interests1 is not None:
+            person1_lat, person1_lng = person1.get_coordinates(address)
+            person2_lat, person2_lng = person2.interests
+
+            if person1_lat == person2_lat and person1_lng == person2_lng:
+                print("Both persons have the same Google route!")
+            else:
+                print("The persons have different Google routes.")
+
+
+person2 = Person_2("John", 25, "Sports")
+person2.find_match()
