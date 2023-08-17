@@ -1,0 +1,101 @@
+import matplotlib.pyplot as plt
+import math
+
+class Questionnaire:
+    def __init__(self, questions):
+        self.questions = questions
+        self.total_scores = []
+
+    def add_response(self, responses):
+        total_score = sum(responses)
+        self.total_scores.append(total_score)
+
+    def plot_total_scores(self):
+        users = range(1, len(self.total_scores) + 1)
+        plt.scatter(users, self.total_scores)
+        plt.xlabel('User')
+        plt.ylabel('Total Score')
+        plt.title('Total Score Based on User Responses')
+        plt.show()
+
+questions = [
+    {
+        'question': 'На сколько вы оцениваете свой внешний вид?',
+        'name': 'appearance'
+    },
+    {
+        'question': 'На сколько вы оцениваете свой чувство юмора?',
+        'name': 'humor'
+    },
+    {
+        'question': 'На сколько вы оцениваете свою интеллектуальность?',
+        'name': 'intelligence'
+    },
+    {
+        'question': 'На сколько вы оцениваете свою активность?',
+        'name': 'activity'
+    },
+    {
+        'question': 'На сколько вы оцениваете свою эмоциональную открытость?',
+        'name': 'emotional_openness'
+    },
+    {
+        'question': 'How confident are you in your decision-making abilities?',
+        'name': 'decision_making'
+    },
+    {
+        'question': 'To what extent do you consider yourself open to new experiences?',
+        'name': 'openness_to_experience'
+    },
+    {
+        'question': 'How well do you manage stress and challenges?',
+        'name': 'stress_management'
+    },
+    {
+        'question': 'How satisfied are you with your work-life balance?',
+        'name': 'work_life_balance'
+    },
+    {
+        'question': 'How empathetic do you think you are towards others?',
+        'name': 'empathy'}
+]
+
+questionnaire = Questionnaire(questions)
+
+num_users = int(input("Введите количество пользователей: "))
+
+for i in range(num_users):
+    print(f"--- Введите ответы для пользователя {i+1} ---")
+    user_responses = []
+    for question in questionnaire.questions:
+        response = int(input(question['question'] + ' (от 0 до 10): '))
+        user_responses.append(response)
+    questionnaire.add_response(user_responses)
+    print()
+
+for i, total_score in enumerate(questionnaire.total_scores):
+    print(f"Ответы пользователя {i+1}:")
+    for question, response in zip(questionnaire.questions, user_responses):
+        print(f"Вопрос: {question['question']}")
+        print(f"Ответ: {response}")
+    print()
+
+questionnaire.plot_total_scores()
+
+distances = []
+min_distance = math.inf
+closest_users = ()
+
+for i in range(len(questionnaire.total_scores) - 1):
+    x1, y1 = i + 1, questionnaire.total_scores[i]
+    x2, y2 = i + 2, questionnaire.total_scores[i + 1]
+    distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+    distances.append(distance)
+
+    if distance < min_distance:
+        min_distance = distance
+        closest_users = (i + 1, i + 2)
+
+print("Distances between points:", distances)
+print(f"The closest users in terms of total score distance are users {closest_users[0]} and {closest_users[1]}.")
+
