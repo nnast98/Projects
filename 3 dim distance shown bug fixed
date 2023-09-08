@@ -1,0 +1,86 @@
+import matplotlib.pyplot as plt
+import math
+
+class Questionnaire:
+    def __init__(self, questions):
+        self.questions = questions
+        self.total_scores = []
+        self.user_numbers = []
+
+    def add_response(self, user_number, responses):
+        total_score = sum(responses)
+        self.total_scores.append(total_score)
+        self.user_numbers.append(user_number)
+
+    def plot_total_scores(self):
+        plt.scatter(self.user_numbers, self.total_scores)
+        plt.xlabel('User Number')
+        plt.ylabel('Total Score')
+        plt.title('Total Score Based on User Responses')
+        plt.show()
+
+questions = [
+    {
+        'question': 'На сколько вы оцениваете свой внешний вид?',
+        'name': 'appearance'
+    },
+    {
+        'question': 'На сколько вы оцениваете свой чувство юмора?',
+        'name': 'humor'
+    },
+    {
+        'question': 'На сколько вы оцениваете свою интеллектуальность?',
+        'name': 'intelligence'
+    },
+    {
+        'question': 'На сколько вы оцениваете свою активность?',
+        'name': 'activity'
+    }
+]
+
+questionnaire = Questionnaire(questions)
+
+num_users = int(input("Введите количество пользователей: "))
+
+for i in range(num_users):
+    print(f"--- Введите ответы для пользователя {i+1} ---")
+    user_responses = []
+    for question in questionnaire.questions:
+        response = int(input(question['question'] + ' (от 0 до 10): '))
+        user_responses.append(response)
+    questionnaire.add_response(i + 1, user_responses)
+    print()
+
+questionnaire.plot_total_scores()
+
+# Calculate distances
+distances = []
+
+for i in range(len(questionnaire.total_scores)):
+    for j in range(i + 1, len(questionnaire.total_scores)):
+        x1, y1 = questionnaire.user_numbers[i], questionnaire.total_scores[i]
+        x2, y2 = questionnaire.user_numbers[j], questionnaire.total_scores[j]
+        distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+        distances.append(distance)
+
+# Create a 3D plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Plot user numbers and distances
+user_pairs = [(i, j) for i in questionnaire.user_numbers for j in questionnaire.user_numbers if i != j]
+user_pairs = list(set(tuple(sorted(pair)) for pair in user_pairs))
+user_pairs = sorted(user_pairs, key=lambda x: (x[0], x[1]))
+
+x, y = zip(*user_pairs)
+z = distances
+
+ax.scatter(x, y, z, c='b', marker='o')
+
+# Set axis labels
+ax.set_xlabel('User Number X')
+ax.set_ylabel('User Number Y')
+ax.set_zlabel('Distance')
+
+plt.title('Distance Between Users Based on Total Score')
+plt.show()
