@@ -1,0 +1,41 @@
+import bcrypt
+
+# Simulated user database (replace with a real database)
+user_db = {}
+
+def register(username, password):
+    if username in user_db:
+        return "Username already exists. Please choose a different one."
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    user_db[username] = hashed_password
+    return "Registration successful."
+
+def login(username, password):
+    hashed_password = user_db.get(username)
+    if hashed_password and bcrypt.checkpw(password.encode('utf-8'), hashed_password):
+        return True
+    return False
+
+# Example usage:
+while True:
+    print("1. Register")
+    print("2. Login")
+    print("3. Quit")
+    choice = input("Enter your choice: ")
+    
+    if choice == '1':
+        username = input("Enter a username: ")
+        password = input("Enter a password: ")
+        result = register(username, password)
+        print(result)
+    elif choice == '2':
+        username = input("Enter your username: ")
+        password = input("Enter your password: ")
+        if login(username, password):
+            print("Login successful!")
+        else:
+            print("Login failed. Please check your username and password.")
+    elif choice == '3':
+        break
+    else:
+        print("Invalid choice. Please choose a valid option.")
