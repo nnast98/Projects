@@ -1,0 +1,143 @@
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import math
+from sklearn.cluster import KMeans
+import random
+import numpy as np
+import pandas as pd
+
+class Questionnaire:
+    def __init__(self):
+        self.questions = [
+            {
+                'question': 'На сколько вы оцениваете свой внешний вид?',
+                'name': 'appearance'
+            },
+            {
+                'question': 'На сколько вы оцениваете свой чувство юмора?',
+                'name': 'humor'
+            },
+            {
+                'question': 'На сколько вы оцениваете свою интеллектуальность?',
+                'name': 'intelligence'
+            },
+            {
+                'question': 'На сколько вы оцениваете свою активность?',
+                'name': 'activity'
+            }
+        ]
+        self.responses = []  # Store user responses as a list of lists
+        self.user_numbers = []
+
+    def add_response(self, user_number, responses):
+        self.responses.append(responses)
+        self.user_numbers.append(user_number)
+
+# Create the Questionnaire instance
+questionnaire = Questionnaire()
+
+# Get the number of users from the user
+num_users = int(input("Введите количество пользователей: "))
+
+for i in range(num_users):
+    print(f"--- Генерация случайных ответов для пользователя {i+1} ---")
+    user_responses = []
+    for _ in questionnaire.questions:
+        # Generate random responses in the range [0, 10]
+        response = random.randint(0, 10)
+        user_responses.append(response)
+    questionnaire.add_response(i + 1, user_responses)
+    print("Сгенерированные ответы:", user_responses)
+    print()
+
+# Calculate distances
+distances = {}
+
+for i in range(len(questionnaire.user_numbers)):
+    for j in range(i + 1, len(questionnaire.user_numbers)):
+        user1_scores = questionnaire.responses[i]
+        user2_scores = questionnaire.responses[j]
+        distance = math.sqrt(sum((x - y) ** 2 for x, y in zip(user1_scores, user2_scores)))
+        distances[(i + 1, j + 1)] = distance
+        distances[(j + 1, i + 1)] = distance  # Make it symmetrical
+
+# Convert distances to a 2D array
+distance_matrix = np.array(list(distances.values())).reshape(-1, 1)
+
+# Perform clustering with a specified number of clusters
+num_clusters = 3  # Change this to the desired number of clusters
+
+kmeans = KMeans(n_clusters=num_clusters, random_state=0)
+clusters = kmeans.fit_predict(distance_matrix)
+
+# Define colors for compatibility
+colors = {
+    0: 'purple',  # Incompatible
+    1: 'yellow',   # Neutral
+    2: 'green'   # Similar
+}
+
+# Create a 3D plot for the clustered data with custom colors
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+# Plot user pairs and distances with custom colors
+user_pairs = list(distances.keys())
+x, y = zip(*user_pairs)
+z = list(distances.values())
+
+# Color the data points based on their assigned cluster
+scatter = ax.scatter(x, y, z, c=[colors[cluster] for cluster in clusters], marker='o')
+
+# Set axis labels
+ax.set_xlabel('User Number X')
+ax.set_ylabel('User Number Y')
+ax.set_zlabel('Distance')
+
+plt.title(f'3D Plot with Compatibility Colors')
+plt.show()
+
+# Create DataFrames for compatibility categories
+# Create DataFrames for compatibility categories
+# Create DataFrames for compatibility categories
+# Create DataFrames for compatibility categories
+# Create DataFrames for compatibility categories
+# Create DataFrames for compatibility categories
+compatibility_data = {
+    'compatible': [],
+    'neutral': [],
+    'incompatible': []
+}
+
+user_pairs = list(distances.keys())
+
+# Define the thresholds for compatibility
+compatible_threshold = 6.0  # Adjust this threshold as needed
+incompatible_threshold = 10.0  # Adjust this threshold as needed
+
+for user1, user2 in user_pairs:
+    distance = distances[(user1, user2)]
+    if distance < compatible_threshold:
+        compatibility = 'compatible'
+    elif distance < incompatible_threshold:
+        compatibility = 'neutral'
+    else:
+        compatibility = 'incompatible'
+
+    compatibility_data[compatibility].append({
+        'User1': user1,
+        'User2': user2,
+        'Distance': distance
+    })
+
+compatible_df = pd.DataFrame(compatibility_data['compatible'])
+neutral_df = pd.DataFrame(compatibility_data['neutral'])
+incompatible_df = pd.DataFrame(compatibility_data['incompatible'])
+
+# Display the DataFrames
+print("Compatible Users:")
+print(compatible_df)
+print("\nNeutral Users:")
+print(neutral_df)
+print("\nIncompatible Users:")
+print(incompatible_df)
